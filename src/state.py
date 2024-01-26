@@ -17,23 +17,24 @@ class State(object):
 
 		return "".join(map(str, flat))
 	
-	def count_inversions(self, matrix=None):
+	def count_inversions(self):
 		"""
 		Returns the number of inversions in a given matrix.
 		https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/
 		"""
-		arr = deepcopy(matrix) if matrix else deepcopy(self.matrix)
-		n = len(arr)
-		arr1=[]
-		for y in arr:
+		n = len(self.matrix)
+		flat = []
+		for y in self.matrix:
 			for x in y:
-				arr1.append(x)
-		arr=arr1
+				flat.append(x)
+
 		inv_count = 0
 		for i in range(n * n - 1):
-			for j in range(i + 1,n * n):
-				if (arr[j] and arr[i] and arr[i] > arr[j]):
-					inv_count+=1
+			for j in range(i + 1, n * n):
+				if (flat[j] and flat[i] and flat[i] > flat[j]):
+					inv_count += 1
+				elif flat[i] == 0:
+					inv_count += 1
 		
 		return inv_count
 	
