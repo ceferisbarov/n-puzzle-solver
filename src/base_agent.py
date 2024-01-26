@@ -31,23 +31,3 @@ class BaseNPuzzleSolver(object):
 			input_matrix.append(values)
 
 		return State(input_matrix)
-	
-	def count_inversions(self, matrix=None):
-		"""
-		Returns the number of inversions in a given matrix.
-		https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/
-		"""
-		arr = deepcopy(matrix) if matrix else deepcopy(self.matrix)
-		n = len(arr)
-		arr1=[]
-		for y in arr:
-			for x in y:
-				arr1.append(x)
-		arr=arr1
-		inv_count = 0
-		for i in range(n * n - 1):
-			for j in range(i + 1,n * n):
-				if (arr[j] and arr[i] and arr[i] > arr[j]):
-					inv_count+=1
-		
-		return inv_count
