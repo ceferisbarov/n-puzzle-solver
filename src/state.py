@@ -1,4 +1,4 @@
-import copy
+from copy import deepcopy
 
 class State(object):
 	def __init__(self, matrix) -> None:
@@ -22,7 +22,7 @@ class State(object):
 		Returns the number of inversions in a given matrix.
 		https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/
 		"""
-		arr = copy.deepcopy(matrix) if matrix else copy.deepcopy(self.matrix)
+		arr = deepcopy(matrix) if matrix else deepcopy(self.matrix)
 		n = len(arr)
 		arr1=[]
 		for y in arr:
@@ -48,10 +48,10 @@ class State(object):
 		i, j = self.get_empty_slot()
 		neighbors = []
 
-		north = copy.deepcopy(self.matrix)
-		east = copy.deepcopy(self.matrix)
-		west = copy.deepcopy(self.matrix)
-		south = copy.deepcopy(self.matrix)
+		north = deepcopy(self.matrix)
+		east = deepcopy(self.matrix)
+		west = deepcopy(self.matrix)
+		south = deepcopy(self.matrix)
 	
 		if i - 1 >= 0:
 			north[i][j], north[i-1][j] = north[i-1][j], north[i][j]
@@ -73,3 +73,22 @@ class State(object):
 	
 	def __eq__(self, other):
 		return self.id == other.id
+	
+	def is_solvable(self):
+		"""
+		Checks if the given matrix is a solvable n-puzzle.
+		"""
+		num_inversions = self.count_inversions()
+		initial_inverse_row = len(self.matrix) - self.get_empty_slot()[0]
+
+		if len(self.matrix) % 2 == 1:
+			return num_inversions % 2 == 0
+
+		if initial_inverse_row % 2 == 1:
+			return num_inversions % 2 == 0 
+		
+		if initial_inverse_row % 2 == 0:
+			return num_inversions % 2 == 1
+		
+		return False
+

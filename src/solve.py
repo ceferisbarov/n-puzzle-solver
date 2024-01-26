@@ -1,7 +1,8 @@
 import argparse
 from datetime import datetime
 
-from random_agent import RandomNPuzzleSolver
+from utils import pprint
+from astart_agent import AStartAgent
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", help="Filepath of the input matrix.")
@@ -10,10 +11,10 @@ args = parser.parse_args()
 
 
 start = datetime.now()
-for i in range(100):
-	print(i)
-	s = RandomNPuzzleSolver(args.input, max_moves=10000000)
+for i in range(5):
+	s = AStartAgent(args.input)
 	s.solve()
+	pprint(s.state.matrix)
 
 end = datetime.now()
 
