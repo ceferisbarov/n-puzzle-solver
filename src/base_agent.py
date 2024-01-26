@@ -1,5 +1,6 @@
 import random
 from config import MIN_N, MAX_N
+import copy
 
 class BaseNPuzzleSolver(object):
 	def __init__(self, filepath) -> None:
@@ -35,7 +36,7 @@ class BaseNPuzzleSolver(object):
 		Returns the number of inversions in a given matrix.
 		https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/
 		"""
-		arr = matrix.copy() if matrix else self.matrix.copy()
+		arr = copy.deepcopy(matrix) if matrix else copy.deepcopy(self.matrix)
 		n = len(arr)
 		arr1=[]
 		for y in arr:
