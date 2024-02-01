@@ -28,14 +28,7 @@ class AStartAgent(BaseNPuzzleSolver):
 		"""
 		Traverses the path with A* star algorithm.
 		If succesfull, updates the state. Otherwise, does nothing.
-		"""
-		# IMPORTANT
-		# FINISH WHEN GOAL IS DEQUEUED
-		# NOT WHEN IT IS ENQUEUED
-
-		# UPDATE THE F SCORE
-		# https://algorithmsinsight.wordpress.com/graph-theory-2/a-star-in-general/implementing-a-star-to-solve-n-puzzle/
-		
+		"""		
 		while(True):
 			current_id = self.open[0]
 			min_f_cost = self.hashtable[current_id].get_f_cost()
@@ -57,25 +50,44 @@ class AStartAgent(BaseNPuzzleSolver):
 					continue
 				
 				exists = False
+				current_depth = self.get_depth(current_object)
 				for i in self.open:
 					i_object = self.hashtable[i]
-					if neighbor == i_object and i_object.h_cost > neighbor.h_cost:
-						i_object.set_f_cost(self.state.matrix)
+					if neighbor.id == i_object.id and i_object.h_cost > neighbor.h_cost:
+						i_object.set_h_cost()
 						i_object.parent = current_id
+						i_object.g_cost = current_depth + 1
 						exists = True
 						break
 
 				if not exists:
-					neighbor.set_f_cost(self.state.matrix)
+					neighbor.set_h_cost()
 					neighbor.parent = current_id
 					self.hashtable[neighbor.id] = neighbor
 					self.open.append(neighbor.id)
 
-	def get_path(self):
+	def get_depth(self, state):
+		depth = 0
+		while(state.parent):
+			depth += 1			
+			state  = self.hashtable[state.parent]
+		
+		return depth
+
+	def save_path(self, save_path):
 		"""
 		Returns the path from original to the final state.
 		"""
 		current_state = self.hashtable[self.final_state_id]
-		while(current_state.parent):
-			pprint(current_state.matrix)
-			current_state  = self.hashtable[current_state.parent]
+		i = 1
+		with open(save_path, "w") as f:
+			while(current_state.parent):
+				save_string = f"state {i}\n"
+				i += 1
+				for line in current_state.matrix:
+					save_string = save_string + "\t".join(map(str, line)) + "\n"
+				
+				save_string += "--------\n"
+				f.write(save_string)
+				
+				current_state  = self.hashtable[current_state.parent]

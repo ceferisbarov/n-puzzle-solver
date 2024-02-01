@@ -10,4 +10,5 @@ args = parser.parse_args()
 
 agent = AStartAgent(args.input)
 agent.solve()
-# agent.get_path()
+if args.output:
+	agent.save_path(args.output)

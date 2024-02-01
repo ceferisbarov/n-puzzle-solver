@@ -8,62 +8,23 @@ class State(object):
 	def __init__(self, matrix) -> None:
 		self.matrix = matrix
 		self.id = self.get_id()
-		self.h_cost = self.count_inversions()
+		self.h_cost = self.linear_conflicts()
 		self.g_cost = 0
 		self.parent = None
 
-	def set_f_cost(self, original_matrix):
+	def set_h_cost(self):
 		"""
 		Set h_cost and g_cost. h_cost is equal to the number of inversions.
 		g_cost is equal to the number of inversions to get to the original permutation.
 		"""
-		self.h_cost = self.count_inversions()
-
-		original_flat = []
-		for y in original_matrix:
-			for x in y:
-				original_flat.append(x)
-
-		self_flat = []
-		for y in self.matrix:
-			for x in y:
-				self_flat.append(x)
-
-		i = 0
-		g_cost = 0
-
-		while(i < len(original_flat)):
-			if original_flat[i] != self_flat[i]:
-				wrong_id = self_flat.index(original_flat[i])
-				if wrong_id < i:
-					self_flat = self_flat[:wrong_id] + \
-								[self_flat[i]] + \
-								self_flat[wrong_id:i] + \
-								self_flat[i+1:]
-				else:
-					self_flat = self_flat[:i] + \
-								[self_flat[wrong_id]] + \
-								self_flat[i:wrong_id] + \
-								self_flat[wrong_id+1:]
-					
-				g_cost += (wrong_id - i)
-				continue
-
-			i += 1
-
-		self.g_cost = g_cost
+		self.h_cost = self.linear_conflicts()
+		# self.g_cost += 1
 		
 	def get_f_cost(self):
 		"""
 		Dynamically returns the f cost.
 		"""
 		return self.h_cost + self.g_cost
-	
-	def __eq__(self, other):
-		"""
-		Override equality operator.
-		"""
-		return self.id == other.id	
 
 	def get_id(self):
 		"""
@@ -157,3 +118,67 @@ class State(object):
 			return num_inversions % 2 == 1
 		
 		return False
+
+	def manhattan(self, candidate, solved):
+		"""
+		Takes as input two flattened matrices,
+		returns the Manhattan distance between them.
+		"""
+		n = len(self.matrix)
+		res = 0
+		for i in range(n * n):
+			if candidate[i] != 0 and candidate[i] != solved[i]:
+				ci = solved.index(candidate[i])
+				y = (i // n) - (ci // n)
+				x = (i % n) - (ci % n)
+				res += abs(y) + abs(x)
+		return res
+
+	def linear_conflicts(self):
+		"""
+		Calculates Manhattan distance + linear conflicts.
+		Adopted from:
+		https://github.com/asarandi/n-puzzle/blob/2853d6bb9e78dede1e4be4d432eb494c09efc3f5/npuzzle/heuristics.py#L46
+		"""
+		n = len(self.matrix)
+		candidate = [element for sublist in self.matrix for element in sublist]
+		solved = list(range(1, n*n))
+		solved.append(0)
+
+		def count_conflicts(candidate_row, solved_row, n, ans=0):
+			counts = [0 for x in range(n)]
+			for i, tile_1 in enumerate(candidate_row):
+				if tile_1 in solved_row and tile_1 != 0:
+					solved_i = solved_row.index(tile_1)
+					for j, tile_2 in enumerate(candidate_row):
+						if tile_2 in solved_row and tile_2 != 0 and i != j:
+							solved_j = solved_row.index(tile_2)
+							if solved_i > solved_j and i < j:
+								counts[i] += 1
+							if solved_i < solved_j and i > j:
+								counts[i] += 1
+			if max(counts) == 0:
+				return ans * 2
+			else:
+				i = counts.index(max(counts))
+				candidate_row[i] = -1
+				ans += 1
+				return count_conflicts(candidate_row, solved_row, n, ans)
+
+		res = self.manhattan(candidate, solved)
+		candidate_rows = [[] for y in range(n)]
+		candidate_columns = [[] for x in range(n)]
+		solved_rows = [[] for y in range(n)]
+		solved_columns = [[] for x in range(n)]
+		for y in range(n):
+			for x in range(n):
+				idx = (y * n) + x
+				candidate_rows[y].append(candidate[idx])
+				candidate_columns[x].append(candidate[idx])
+				solved_rows[y].append(solved[idx])
+				solved_columns[x].append(solved[idx])
+		for i in range(n):
+			res += count_conflicts(candidate_rows[i], solved_rows[i], n)
+		for i in range(n):
+			res += count_conflicts(candidate_columns[i], solved_columns[i], n)
+		return res
