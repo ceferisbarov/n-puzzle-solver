@@ -1,9 +1,11 @@
-import random
 from utils import MIN_N, MAX_N
-from copy import deepcopy
 from state import State
 
 class BaseNPuzzleSolver(object):
+	"""
+	This is a base class for N-puzzle agents.
+	It reads and validates the input, and checks if it is solvable.
+	"""
 	def __init__(self, filepath) -> None:
 		self.state = self.read_input(filepath)
 
