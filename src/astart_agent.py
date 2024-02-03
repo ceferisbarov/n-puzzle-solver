@@ -79,14 +79,14 @@ class AStartAgent(object):
 				for i in self.open:
 					i_object = self.hashtable[i]
 					if neighbor.id == i_object.id and i_object.h_cost > neighbor.h_cost:
-						i_object.set_h_cost()
+						i_object.set_f_cost()
 						i_object.parent = current_id
 						i_object.g_cost = current_depth + 1
 						exists = True
 						break
 
 				if not exists:
-					neighbor.set_h_cost()
+					neighbor.set_f_cost()
 					neighbor.parent = current_id
 					self.hashtable[neighbor.id] = neighbor
 					self.open.append(neighbor.id)

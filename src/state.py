@@ -12,13 +12,13 @@ class State(object):
 		self.g_cost = 0
 		self.parent = None
 
-	def set_h_cost(self):
+	def set_f_cost(self):
 		"""
 		Set h_cost and g_cost. h_cost is equal to the number of inversions.
 		g_cost is equal to the number of inversions to get to the original permutation.
 		"""
 		self.h_cost = self.linear_conflicts()
-		# self.g_cost += 1
+		self.g_cost += 1
 		
 	def get_f_cost(self):
 		"""
@@ -103,7 +103,6 @@ class State(object):
 	def is_solvable(self):
 		"""
 		Checks if the given matrix is a solvable n-puzzle.
-		https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/
 		"""
 		num_inversions = self.count_inversions(ignore_zero=True)
 		initial_inverse_row = len(self.matrix) - self.get_empty_slot()[0]
@@ -123,6 +122,8 @@ class State(object):
 		"""
 		Takes as input two flattened matrices,
 		returns the Manhattan distance between them.
+		Adapted from:
+		https://github.com/asarandi/n-puzzle/blob/2853d6bb9e78dede1e4be4d432eb494c09efc3f5/npuzzle/heuristics.py#L46
 		"""
 		n = len(self.matrix)
 		res = 0
@@ -137,7 +138,7 @@ class State(object):
 	def linear_conflicts(self):
 		"""
 		Calculates Manhattan distance + linear conflicts.
-		Adopted from:
+		Adapted from:
 		https://github.com/asarandi/n-puzzle/blob/2853d6bb9e78dede1e4be4d432eb494c09efc3f5/npuzzle/heuristics.py#L46
 		"""
 		n = len(self.matrix)
